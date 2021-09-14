@@ -148,6 +148,16 @@ def direction(path,User_classification):
     return df_new    
 
 
+
+def printquintile(name,data):
+    print(name+"의 5분위수 출력")
+    print("최소 값:",data[0])
+    print("25% 값:",data[1])
+    print("50% 값:",data[2])
+    print("75% 값:",data[3])
+    print("최대 값:",data[4])
+    print()
+    
 # 3대운동 부위별 각도 계산
 # 1. 벤치프레스
 def benchpress_angle(path):
@@ -155,9 +165,14 @@ def benchpress_angle(path):
     left_arm = angle(path, 5,6,7) # 왼팔
     right_arm = angle(path, 2,3,4) # 오른팔
     
-    #5분위수 저장-왼쪽 팔
+    #5분위수 저장-왼쪽 팔,오른쪽팔
     benchpress_left_angle=quintile(left_arm)
     benchpress_right_angle=quintile(right_arm)
+    
+    
+    printquintile("왼팔",benchpress_left_angle)
+    printquintile("오른팔",benchpress_right_angle)
+
 
     #5분위수 리턴
     return [benchpress_left_angle , benchpress_right_angle]
@@ -178,6 +193,11 @@ def deadlift_angle(path):
     deadlift_spine=quintile(spine)
     
     
+    printquintile("뒷목",deadlift_back_neck)
+    printquintile("오른 뒷 무릎",deadlift_back_right_knee)
+    printquintile("오른팔",deadlift_right_arm)
+    printquintile("척추",deadlift_spine)
+    
     #5분위수 리턴
     return [deadlift_back_neck,deadlift_back_right_knee,deadlift_right_arm,deadlift_spine]
 
@@ -192,6 +212,10 @@ def squat_angle(path):
     squat_neck=quintile(back_neck)
     squat_right_knee=quintile(back_right_knee)
     squat_spine=quintile(spine)
+    
+    printquintile("뒷목",squat_neck)
+    printquintile("오른쪽 뒷 무릎",squat_right_knee)
+    printquintile("척추",squat_spine)
     
     return [squat_neck,squat_right_knee,squat_spine]
    

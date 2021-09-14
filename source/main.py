@@ -12,8 +12,8 @@ user_csv_path='./user/user_output.csv'
 
 
 #0,0 체크
-compare.check(trainer_csv_path)
-compare.check(user_csv_path)
+#compare.check(trainer_csv_path)
+#compare.check(user_csv_path)
 
 
 #이동한 거리(머리)
@@ -43,4 +43,4 @@ compare.check(user_csv_path)
 
 # 3. 스쿼트
 sq_angle = compare.squat_angle(trainer_csv_path)
-print(sq_angle) # 스쿼트 모든 각도 5분위수  출력 - 뒷목, 무릎, 척추 순
+#print(sq_angle) # 스쿼트 모든 각도 5분위수  출력 - 뒷목, 무릎, 척추 순
