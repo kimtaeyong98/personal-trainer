@@ -29,6 +29,7 @@ def get_video(exercise_Type, User_classification):
     n_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     fps = int(cap.get(cv2.CAP_PROP_FPS))
     ok, frame = cap.read()
+    frame = cv2.resize(frame, (640,360), cv2.INTER_AREA)#해상도 조절
     (frameHeight, frameWidth) = frame.shape[:2]
     h = frameHeight
     w = frameWidth

@@ -3,7 +3,7 @@ import compare
 import numpy as np
 
 #main
-#get_video_csv.get_video("스쿼트","user")#user 스켈레톤 동영상과 csv 얻기
+get_video_csv.get_video("스쿼트","user")#user 스켈레톤 동영상과 csv 얻기
 #get_video_csv.get_video("스쿼트","trainer")#trainer 스켈레톤 동영상과 csv 얻기
 
 #csv 경로
@@ -42,5 +42,5 @@ user_csv_path='./user/user_output.csv'
 
 
 # 3. 스쿼트
-sq_angle = compare.squat_angle(trainer_csv_path)
+#sq_angle = compare.squat_angle(trainer_csv_path)
 #print(sq_angle) # 스쿼트 모든 각도 5분위수  출력 - 뒷목, 무릎, 척추 순
