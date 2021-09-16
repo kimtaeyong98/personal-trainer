@@ -4,11 +4,11 @@ import numpy as np
 
 #main
 get_video_csv.get_video("스쿼트","user")#user 스켈레톤 동영상과 csv 얻기
-#get_video_csv.get_video("스쿼트","trainer")#trainer 스켈레톤 동영상과 csv 얻기
+get_video_csv.get_video("스쿼트","trainer")#trainer 스켈레톤 동영상과 csv 얻기
 
 #csv 경로
-trainer_csv_path='./trainer/trainer_output.csv'
-user_csv_path='./user/user_output.csv'
+#trainer_csv_path='./trainer/trainer_output.csv'
+#user_csv_path='./user/user_output.csv'
 
 
 #0,0 체크

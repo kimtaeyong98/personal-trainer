@@ -13,11 +13,26 @@ def get_video(exercise_Type, User_classification):
     weightsFile = "./model/pose_iter_160000.caffemodel"
 
     if User_classification == "trainer":
-        video_path = './video/trainer.mp4'
+        if exercise_Type ==  "스쿼트":
+            video_path = './video/스쿼트_트레이너.mp4'
+        elif exercise_Type == "벤치프레스":
+            video_path = './video/벤치_트레이너.mp4'
+        else: 
+            print("파일이 없습니다.")
+            return
+        
         out_path = './trainer/trainer_output.mp4'  # 결과 파일
         csv_path = './trainer/trainer_output.csv'  # 결과 파일 csv
+        
     else:
-        video_path = './video/user.mp4'
+        if exercise_Type ==  "스쿼트":
+            video_path = './video/스쿼트_유저.mp4'
+        elif exercise_Type == "벤치프레스":
+            video_path = './video/벤치_유저.mp4'
+        else: 
+            print("파일이 없습니다.")
+            return
+        
         out_path = './user/user_output.mp4'  # 결과 파일
         csv_path = './user/user_output.csv'  # 결과 파일 csv
 
@@ -31,6 +46,7 @@ def get_video(exercise_Type, User_classification):
     ok, frame = cap.read()
     frame = cv2.resize(frame, (640,360), cv2.INTER_AREA)#해상도 조절
     (frameHeight, frameWidth) = frame.shape[:2]
+    print(frameHeight, frameWidth)
     h = frameHeight
     w = frameWidth
 
@@ -134,12 +150,6 @@ def get_video(exercise_Type, User_classification):
 
             #print(i," ",points[i][0], points[i][1],'',end='')
 
-        # print()
-        # for pair in pairs:
-        #     partA = pair[0]
-        #     partB = pair[1]
-        #     cv2.line(frame_copy, points[partA], points[partB],
-        #              line_color, 1, lineType=cv2.LINE_AA)
 
         if exercise_Type == "벤치프레스":
             for pair in bnp_pairs:
@@ -185,7 +195,16 @@ def get_video(exercise_Type, User_classification):
                     i), (points[i][0], points[i][1]), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 1, lineType=cv2.LINE_AA)
 
                 frame_xy[i].append((points[i][0], points[i][1]))
+        else:
+            for pair in pairs:
+                partA = pair[0]
+                partB = pair[1]
+                cv2.line(frame_copy, points[partA], points[partB],
+                    line_color, 1, lineType=cv2.LINE_AA)
+                
 
+                
+    
         if writer is None:
             writer = cv2.VideoWriter(out_path, fourcc, fps,
                                      (f_w, f_h), True)
