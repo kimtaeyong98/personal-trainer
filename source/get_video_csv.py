@@ -15,26 +15,37 @@ def get_video(exercise_Type, User_classification):
     if User_classification == "trainer":
         if exercise_Type ==  "스쿼트":
             video_path = './video/스쿼트_트레이너.mp4'
+            out_path = './trainer/스쿼트/트레이너_스쿼트.mp4'  # 결과 파일
+            csv_path = './trainer/스쿼트/트레이너_스쿼트.csv'  # 결과 파일 csv
         elif exercise_Type == "벤치프레스":
-            video_path = './video/벤치_트레이너.mp4'
-        else: 
+            video_path = './video/벤치프레스_트레이너.mp4'
+            out_path = './trainer/벤치프레스/트레이너_벤치프레스.mp4'  # 결과 파일
+            csv_path = './trainer/벤치프레스/트레이너_벤치프레스.csv'  # 결과 파일 csv
+        elif exercise_Type== "풀업": 
+            video_path = './video/풀업_트레이너.mp4'
+            out_path = './trainer/풀업/트레이너_풀업.mp4'  # 결과 파일
+            csv_path = './trainer/풀업/트레이너_풀업.csv'  # 결과 파일 csv
+        else:
             print("파일이 없습니다.")
             return
-        
-        out_path = './trainer/trainer_output.mp4'  # 결과 파일
-        csv_path = './trainer/trainer_output.csv'  # 결과 파일 csv
         
     else:
         if exercise_Type ==  "스쿼트":
             video_path = './video/스쿼트_유저.mp4'
+            out_path = './user/스쿼트/유저_스쿼트.mp4'  # 결과 파일
+            csv_path = './user/스쿼트/유저_스쿼트.csv'  # 결과 파일 csv
         elif exercise_Type == "벤치프레스":
-            video_path = './video/벤치_유저.mp4'
+            video_path = './video/벤치프레스_유저.mp4'
+            out_path = './user/벤치프레스/유저_벤치프레스.mp4'  # 결과 파일
+            csv_path = './user/벤치프레스/유저_벤치프레스.csv'  # 결과 파일 csv
+        elif exercise_Type =="풀업":
+            video_path = './video/풀업_유저.mp4'
+            out_path = './user/풀업/유저_풀업.mp4'  # 결과 파일
+            csv_path = './user/풀업/유저_풀업.csv'  # 결과 파일 csv
         else: 
             print("파일이 없습니다.")
             return
-        
-        out_path = './user/user_output.mp4'  # 결과 파일
-        csv_path = './user/user_output.csv'  # 결과 파일 csv
+    
 
     # 모델과 가중치 불러오기
     net = cv2.dnn.readNetFromCaffe(protoFile, weightsFile)
@@ -74,7 +85,7 @@ def get_video(exercise_Type, User_classification):
              [8, 9], [9, 10], [11, 12], [12, 13]]  # 다리
     
 
-    bnp_pairs = [[2, 3], [3, 4],  # 벤치프레스 선택 시 부위
+    bnp_pairs = [[2, 3], [3, 4],  # 벤치프레스 or 풀업 선택 시 부위
                  [5, 6], [6, 7]]
 
     bnp_points = [2, 3, 4, 5, 6, 7]
@@ -87,12 +98,6 @@ def get_video(exercise_Type, User_classification):
     sqt_points = [0, 1, 8, 9, 10, 14]
 
 
-    ddl_pairs = [[0, 1],         # 데드리프트 선택 시 부위
-                 [1, 14], [8, 14],
-                 [2, 3], [3, 4],
-                 [8, 9], [9, 10]]
-
-    ddl_points = [0, 1, 2, 3, 4, 8, 9, 10, 14]
 
     # 임계값
     thresh = 0.1
@@ -151,7 +156,7 @@ def get_video(exercise_Type, User_classification):
             #print(i," ",points[i][0], points[i][1],'',end='')
 
 
-        if exercise_Type == "벤치프레스":
+        if (exercise_Type == "벤치프레스" or exercise_Type == "풀업") :
             for pair in bnp_pairs:
                 partA = pair[0]
                 partB = pair[1]
@@ -181,21 +186,7 @@ def get_video(exercise_Type, User_classification):
 
                 frame_xy[i].append((points[i][0], points[i][1]))
 
-        elif exercise_Type == "데드리프트":
-            for pair in ddl_pairs:
-                partA = pair[0]
-                partB = pair[1]
-                cv2.line(frame_copy, points[partA], points[partB],
-                         line_color, 1, lineType=cv2.LINE_AA)
-
-            for i in ddl_points:  # len(points)
-                cv2.circle(frame_copy, (points[i][0],
-                                        points[i][1]), 5, circle_color, -1)
-                cv2.putText(frame_copy, str(
-                    i), (points[i][0], points[i][1]), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 1, lineType=cv2.LINE_AA)
-
-                frame_xy[i].append((points[i][0], points[i][1]))
-        else:
+        else:#아무 운동이 아닐시 모든 부위 딕텍션
             for pair in pairs:
                 partA = pair[0]
                 partB = pair[1]

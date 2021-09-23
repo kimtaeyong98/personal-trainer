@@ -2,6 +2,142 @@ import pandas as pd
 import math
 import numpy as np
 
+
+#4구간 평균 각도 비교
+def angle_parts(data,data2):#트레이너데이터, 유저 데이터
+    T_data_length=len(data)
+    
+    T_first=np.mean(data[0:int(T_data_length*0.25)])
+    T_second= np.mean(data[int(T_data_length*0.25):int(T_data_length*0.5)])
+    T_third=np.mean(data[int(T_data_length*0.5):int(T_data_length*0.75)])
+    T_last=np.mean(data[int(T_data_length*0.75):T_data_length-1])
+    
+    # print("트레이너")
+    # print("0%~25% 평균 각도", T_first)
+    # print("25%~50% 평균 각도", T_second)
+    # print("50%~75% 평균 각도", T_third)
+    # print("75%~100% 평균 각도", T_last)
+    
+    U_data_length=len(data2)
+    U_first=np.mean(data2[0:int(U_data_length*0.25)])
+    U_second= np.mean(data2[int(U_data_length*0.25):int(U_data_length*0.5)])
+    U_third=np.mean(data2[int(U_data_length*0.5):int(U_data_length*0.75)])
+    U_last=np.mean(data2[int(U_data_length*0.75):U_data_length-1])
+    
+    # print("유저")
+    # print("0%~25% 평균 각도", U_first)
+    # print("25%~50% 평균 각도", U_second)
+    # print("50%~75% 평균 각도", U_third)
+    # print("75%~100% 평균 각도", U_last)
+    
+    first_result=round(U_first/T_first*100,1)
+    second_result=round(U_second/T_second*100,1)
+    third_result=round(U_third/T_third*100,1)
+    last_result=round(U_last/T_last*100,1)
+    print("트레이너 대비 0%~25% 구간 평균각도 비율:",first_result)
+    print("트레이너 대비 25%~50% 구간 평균각도 비율:",second_result)
+    print("트레이너 대비 50%~75% 구간 평균각도 비율:",third_result)
+    print("트레이너 대비 75%~100% 구간 평균각도 비율:",last_result)
+    
+    
+
+#각도변화량 계산
+def angle_change(U,T,E):#유저,트레이너,운동종류
+    user_path=check_path(U,E)
+    trainer_path=check_path(T,E)
+    
+    if E=="스쿼트":
+        print("<스쿼트>-각도변화량")
+        T_back_neck = angle(trainer_path, 14,1,0)#뒷목
+        U_back_neck = angle(user_path,14,1,0)
+        print("뒷목 각도 변화:")
+        angle_parts(T_back_neck,U_back_neck)
+        print()
+        
+        T_back_right_knee = angle(trainer_path, 10,9,8) # 오른쪽 뒷무릎
+        U_back_right_knee = angle(user_path, 10,9,8)
+        print("무릎 각도 변화:")
+        angle_parts(T_back_right_knee,U_back_right_knee)
+        print()
+        
+        T_spine = angle(trainer_path, 8,14,1)#척추
+        U_spine= angle(user_path, 8,14,1)#척추
+        print("척추 각도 변화:")
+        angle_parts(T_spine,U_spine)
+        print()
+        
+    elif E=="벤치프레스":
+        print("<벤치프레스>-각도변화량")
+        T_left_arm = angle(trainer_path, 2,3,4) # 왼팔
+        T_right_arm = angle(trainer_path, 7,6,5) # 오른팔
+        U_left_arm = angle(user_path, 2,3,4) # 왼팔
+        U_right_arm = angle(user_path, 7,6,5) # 오른팔
+        print("왼팔 각도 변화:")
+        angle_parts(T_left_arm,U_left_arm)
+        print()
+        print("오른팔 각도 변화:")
+        angle_parts(T_right_arm,U_right_arm)
+        print()
+        
+#가동범위 출력 함수
+def range_motion(U,T,E):#유저,트레이너,운동종류
+    user_path=check_path(U,E)
+    trainer_path=check_path(T,E)
+    
+    if E=="스쿼트":
+        trainer_range=squat_angle(trainer_path)
+        user_range=squat_angle(user_path)
+        T_knee=max(trainer_range[1])-min(trainer_range[1])
+        U_Knee=max(user_range[1])-min(user_range[1])
+        print("<스쿼트>- 가동범위 비교 결과:")
+        # print("트레이너 무릎 가동범위",T_knee)
+        result=round((U_Knee/T_knee)*100,1)
+        print("트레이너 대비 무릎 가동범위 비율:", result)
+        print()
+        # if 85<=result<=100 :
+        #     print("참 잘했어요.")
+        # elif result>100:
+        #     print("너무 많이 움직였어요ㅠㅠ")
+        # else:
+        #     print("좀 더 움직이세요!")
+        # print()
+        
+    elif E=="벤치프레스":
+        trainer_range=benchpress_angle(trainer_path)
+        user_range=benchpress_angle(user_path)
+        T_right_angle=max(trainer_range[1])-min(trainer_range[1])
+        T_left_angle=max(trainer_range[0])-min(trainer_range[0])
+        U_right_angle=max(user_range[1])-min(user_range[1])
+        U_left_angle=max(user_range[0])-min(user_range[0])
+        
+        print("<벤치프레스>- 가동범위 비교 결과:")
+        # print("트레이너 왼팔 가동범위",T_left_angle)
+        # print("트레이너 오른팔 가동범위",T_right_angle)
+        # print("유저 왼팔 가동범위",U_left_angle)
+        # print("유저 오른팔 가동범위",U_right_angle)
+        
+        left_result=round((U_left_angle/T_left_angle)*100,1)
+        right_result=round((U_right_angle/T_right_angle)*100,1)
+        print("트레이너 대비 왼팔 가동범위 비율:", left_result)
+        print("트레이너 대비 오른팔 가동범위 비율:", right_result)
+        print()
+        
+        # if 85<=left_result<=100 :
+        #     print("왼팔: 참 잘했어요.")
+        # elif right_result>100:
+        #     print("왼팔: 너무 많이 움직였어요ㅠㅠ")
+        # else:
+        #     print("왼팔: 좀 더 움직이세요!")
+
+        
+        # if 85<=right_result<=100 :
+        #     print("오른팔: 참 잘했어요.")
+        # elif right_result>100:
+        #     print("오른팔: 너무 많이 움직였어요ㅠㅠ")
+        # else:
+        #     print("오른팔: 좀 더 움직이세요!")
+        # print()
+       
 #5분위수 반환 함수
 def quintile(data):
     quintile=[]
@@ -13,8 +149,29 @@ def quintile(data):
     
     return quintile
 
+#파일 경로 설정해주는 함수
+def check_path(User_classification,exercise_Type):
+    if User_classification=="trainer" and exercise_Type=="벤치프레스":
+        path="./trainer/벤치프레스/트레이너_벤치프레스.csv"
+    elif User_classification=="trainer" and exercise_Type=="스쿼트":
+        path="./trainer/스쿼트/트레이너_스쿼트.csv"
+    elif User_classification=="trainer" and exercise_Type=="풀업":
+        path="./trainer/풀업/트레이너_풀업.csv"
+    elif User_classification=="user" and exercise_Type=="벤치프레스":
+        path="./user/벤치프레스/유저_벤치프레스.csv"
+    elif User_classification=="user" and exercise_Type=="스쿼트":
+        path="./user/스쿼트/유저_스쿼트.csv"
+    elif User_classification=="user" and exercise_Type=="풀업":
+        path="./user/풀업/유저_풀업.csv"
+    else:
+        print("파일이 없습니다.")
+        return
+    return path
+
 #포인트 이동 중 (0,0)으로 튄 포인트 찾아서 보정 후 다시 저장, 필요없는 문자제거
-def check(path):
+def check(User_classification,exercise_Type):
+    
+    path=check_path(User_classification,exercise_Type)
     data = pd.read_csv(path)
     row,column =data.shape
     row=int(row)
@@ -35,39 +192,6 @@ def check(path):
                 
     data.to_csv(path,header=True,index=False)#csv로 다시 저장
      
-
-
-#두점 사이 거리 구하기
-def length(x1,y1,x2,y2):
-    return math.sqrt(math.pow(x2-x1,2)+math.pow(y2-y1,2))
-
-
-
-#총 이동한 픽셀 거리 반환
-def distance(path,part):
-    total_distance=0#총길이
-    
-    x,y=0,0#현재 좌표
-    next_x,next_y= 0,0#다음 좌표
-    
-    data = pd.read_csv(path)
-    data=data[part]#부위 데이터만 추출
-    
-    #처음 좌표
-    x,y=data[0].split(", ")
-    x,y=int(x),int(y)
-
-    for i in range(len(data)-1):
-        if data[i] != data[i+1]:#위치가 변했을 경우
-            next_x,next_y=data[i+1].split(", ")#좌표 저장
-            next_x,next_y=int(next_x),int(next_y)
-            total_distance+=length(x,y,next_x,next_y)
-            x,y=next_x,next_y
-                  
-    return total_distance    
-
-
-
 #csv 파일 경로와 3부위를 입력받아 angle을 구하는 함수-맞는 알고리즘인지 코드검수 필요
 def angle(path,first,second,third):
     data = pd.read_csv(path)
@@ -92,9 +216,14 @@ def angle(path,first,second,third):
         det=s_to_f[0]*s_to_t[1]-s_to_f[1]*s_to_t[0]
         
         theta=np.rad2deg(np.arctan2(det, dot))
+        
+        if theta < 0:
+            theta=theta+360.0
+            
         angle_list.append(theta)
 
 
+    
     return angle_list
 
 #전프레임에서 다음프레임 부위 이동방향 구하는 함수
@@ -109,32 +238,35 @@ def direction(path,User_classification):
             
             #처음 좌표
             data_1=data.iat[j,i]
-            x1,y1=data_1.split(", ")
-            x1,y1=int(x1),int(y1)
-    
-            data_2=data.iat[j+1,i]
-            x2,y2=data_2.split(", ")
-            x2,y2=int(x2),int(y2)
+            try:
+                x1,y1=data_1.split(", ")
+                x1,y1=int(x1),int(y1)
+        
+                data_2=data.iat[j+1,i]
+                x2,y2=data_2.split(", ")
+                x2,y2=int(x2),int(y2)
+            except:
+                pass
 
             a=math.atan2(-(y2-y1),x2-x1)*(180/math.pi) # 방위각 계산, cv좌표계 -> y축변환
             
             if x1==x2 and y1==y2:
-                direct="＃" #움직임 없음
-            elif 0<=a<=45: 
+                direct="X" #움직임 변화가 없을때
+            elif -22.5<=a<=22.5: 
                 direct=1 # →에서 ↗까지
-            elif 45<a<=90: 
+            elif 22.5<a<=67.5: 
                 direct=2 # ↗에서 ↑까지
-            elif 90<a<=135:
+            elif 67.5<a<=112.5:
                 direct=3 # ↑에서 ↖까지
-            elif 135<a<=180:
+            elif 112.5<a<=157.5:
                 direct=4 # ↖에서 ←까지
-            elif -180<a<=-135: 
+            elif 157.5<a<=-157.5: 
                 direct=5 # ←에서 ↙까지
-            elif -135<a<=-90: 
+            elif -157.5<a<=-112.5: 
                 direct=6 # ↙에서 ↓까지
-            elif -90<a<=-45: 
+            elif -112.5<a<=-67.5: 
                 direct=7 # ↓에서 ↘까지
-            elif -45<a<0:
+            elif -67.5<a<-22.5:
                 direct=8 #↘에서 →까지
         
             df= df.append(pd.DataFrame([[j,direct]], columns=["id",i]), ignore_index=True)
@@ -147,75 +279,31 @@ def direction(path,User_classification):
         df_new.to_csv("./user/direct.csv", index = False)
     return df_new    
 
-
-
-def printquintile(name,data):
-    print(name+"의 5분위수 출력")
-    print("최소 값:",data[0])
-    print("25% 값:",data[1])
-    print("50% 값:",data[2])
-    print("75% 값:",data[3])
-    print("최대 값:",data[4])
-    print()
-    
-# 3대운동 부위별 각도 계산
+# 운동 부위별 각도 계산
 # 1. 벤치프레스
 def benchpress_angle(path):
     
-    left_arm = angle(path, 5,6,7) # 왼팔
-    right_arm = angle(path, 2,3,4) # 오른팔
+    left_arm = angle(path, 2,3,4) # 왼팔
+    right_arm = angle(path, 7,6,5) # 오른팔
     
     #5분위수 저장-왼쪽 팔,오른쪽팔
     benchpress_left_angle=quintile(left_arm)
     benchpress_right_angle=quintile(right_arm)
     
-    
-    printquintile("왼팔",benchpress_left_angle)
-    printquintile("오른팔",benchpress_right_angle)
-
-
     #5분위수 리턴
     return [benchpress_left_angle , benchpress_right_angle]
 
- 
-# 2. 데드리프트
-def deadlift_angle(path):
-    
-    back_neck = angle(path, 0,1,14) #뒷목
-    back_right_knee = angle(path, 8,9,10) # 오른쪽 뒷무릎
-    right_arm = angle(path, 2,3,4) # 오른팔
-    spine = angle(path, 1,14,8)#척추
-    
-    #5분위수 계산
-    deadlift_back_neck=quintile(back_neck)
-    deadlift_back_right_knee=quintile(back_right_knee)
-    deadlift_right_arm=quintile(right_arm)
-    deadlift_spine=quintile(spine)
-    
-    
-    printquintile("뒷목",deadlift_back_neck)
-    printquintile("오른 뒷 무릎",deadlift_back_right_knee)
-    printquintile("오른팔",deadlift_right_arm)
-    printquintile("척추",deadlift_spine)
-    
-    #5분위수 리턴
-    return [deadlift_back_neck,deadlift_back_right_knee,deadlift_right_arm,deadlift_spine]
-
-# 3. 스쿼트
+# 2. 스쿼트
 def squat_angle(path):
     
-    back_neck = angle(path, 0,1,14)#뒷목
-    back_right_knee = angle(path, 8,9,10) # 오른쪽 뒷무릎
-    spine = angle(path, 1,14,8)#척추
+    back_neck = angle(path, 14,1,0)#뒷목
+    back_right_knee = angle(path, 10,9,8) # 오른쪽 뒷무릎
+    spine = angle(path, 8,14,1)#척추
     
     #5분위수 계산
     squat_neck=quintile(back_neck)
     squat_right_knee=quintile(back_right_knee)
     squat_spine=quintile(spine)
-    
-    printquintile("뒷목",squat_neck)
-    printquintile("오른쪽 뒷 무릎",squat_right_knee)
-    printquintile("척추",squat_spine)
     
     return [squat_neck,squat_right_knee,squat_spine]
    
