@@ -327,8 +327,13 @@ def move_direct(User_classification,exercise_Type):
         return
     
     data = pd.read_csv(path)
+    
+    if exercise_Type=="벤치프레스":
+        measure_body = [2, 3, 4, 5, 6, 7] #4,7:손목 3,6:팔꿈치 2,5:어깨
+    elif exercise_Type=="스쿼트":
+        measure_body = [8, 9, 14] #8:엉덩이 9:무릎 14:명치
        
-    for i in range(0,15):
+    for i in measure_body:
         list=[]
         for j in range(0,len(data)-1):
             direct=data.iat[j,i]
@@ -348,10 +353,8 @@ def move_direct(User_classification,exercise_Type):
                 if list[k]==list[k+1]:
                     del list[k+1]
                     
-            
-        if len(list)!=0:
-            print("[{}] direct:{} \nchanged point count:{}".format(i,list,len(list)-1))
-
+    print("[{}] direct:{} \nchanged point count:{}".format(i,list,len(list)-1))
+       
 # 운동 부위별 각도 계산
 # 1. 벤치프레스
 def benchpress_angle(path):
