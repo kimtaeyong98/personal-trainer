@@ -352,9 +352,8 @@ def move_direct(User_classification,exercise_Type):
             for k in range(0,len(list)-1):
                 if list[k]==list[k+1]:
                     del list[k+1]
-                    
-    print("[{}] direct:{} \nchanged point count:{}".format(i,list,len(list)-1))
-       
+        print("[{}] direct:{} \nchanged point count:{}".format(i,list,len(list)-1))
+        
 # 운동 부위별 각도 계산
 # 1. 벤치프레스
 def benchpress_angle(path):
