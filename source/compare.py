@@ -1,6 +1,11 @@
 import pandas as pd
 import math
 import numpy as np
+import sys
+import io
+
+sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding = 'utf-8')
+sys.stderr = io.TextIOWrapper(sys.stderr.detach(), encoding = 'utf-8')
 
 
 #4구간 평균 각도 비교
@@ -227,8 +232,8 @@ def angle(path,first,second,third):
     return angle_list
 
 #전프레임에서 다음프레임 부위 이동방향 구하는 함수
-def direction(path,User_classification):
-    data = pd.read_csv(path)
+def direct(User_classification,exercise_Type):
+    data = pd.read_csv(check_path(User_classification,exercise_Type)) #check path
     row_count=len(data) #프레임수
     df_new=pd.DataFrame()
     
@@ -238,47 +243,117 @@ def direction(path,User_classification):
             
             #처음 좌표
             data_1=data.iat[j,i]
-            try:
-                x1,y1=data_1.split(", ")
-                x1,y1=int(x1),int(y1)
+            if pd.isnull(data_1):
+                continue
+            
+            x1,y1=data_1.split(", ")
+            x1,y1=int(x1),int(y1)
         
-                data_2=data.iat[j+1,i]
-                x2,y2=data_2.split(", ")
-                x2,y2=int(x2),int(y2)
-            except:
-                pass
+            data_2=data.iat[j+1,i]
+            x2,y2=data_2.split(", ")
+            x2,y2=int(x2),int(y2)
+            
+        
 
             a=math.atan2(-(y2-y1),x2-x1)*(180/math.pi) # 방위각 계산, cv좌표계 -> y축변환
             
             if x1==x2 and y1==y2:
-                direct="X" #움직임 변화가 없을때
+                direct="" #움직임 변화가 없을때
             elif -22.5<=a<=22.5: 
-                direct=1 # →에서 ↗까지
+                direct=1 # →
             elif 22.5<a<=67.5: 
-                direct=2 # ↗에서 ↑까지
+                direct=2 # ↗
             elif 67.5<a<=112.5:
-                direct=3 # ↑에서 ↖까지
+                direct=3 # ↑
             elif 112.5<a<=157.5:
-                direct=4 # ↖에서 ←까지
-            elif 157.5<a<=-157.5: 
-                direct=5 # ←에서 ↙까지
+                direct=4 # ↖
+            elif -180<a<=-157.5 or 157.5<a<=180:
+                direct=5 # ←
             elif -157.5<a<=-112.5: 
-                direct=6 # ↙에서 ↓까지
+                direct=6 # ↙
             elif -112.5<a<=-67.5: 
-                direct=7 # ↓에서 ↘까지
+                direct=7 # ↓
             elif -67.5<a<-22.5:
-                direct=8 #↘에서 →까지
+                direct=8 #↘
         
             df= df.append(pd.DataFrame([[j,direct]], columns=["id",i]), ignore_index=True)
         df_new=df_new.append(df[i])
     
     df_new=df_new.transpose()
-    if User_classification=='trainer':
-        df_new.to_csv("./trainer/direct.csv", index = False)
+    
+    #경로에 방향 csv 저장
+    if User_classification=="trainer" and exercise_Type=="벤치프레스":
+        df_new.to_csv("./trainer/벤치프레스/트레이너_벤치프레스_방향.csv", index = False)
+    elif User_classification=="trainer" and exercise_Type=="스쿼트":
+        df_new.to_csv("./trainer/스쿼트/트레이너_스쿼트_방향.csv", index = False)
+    elif User_classification=="trainer" and exercise_Type=="풀업":
+        df_new.to_csv("./trainer/풀업/트레이너_풀업_방향.csv", index = False)
+    elif User_classification=="user" and exercise_Type=="벤치프레스":
+        df_new.to_csv("./user/벤치프레스/유저_벤치프레스_방향.csv", index = False)
+    elif User_classification=="user" and exercise_Type=="스쿼트":
+        df_new.to_csv("./user/스쿼트/유저_스쿼트_방향.csv", index = False)
+    elif User_classification=="user" and exercise_Type=="풀업":
+        df_new.to_csv("./user/풀업/유저_풀업_방향.csv", index = False)
     else:
-        df_new.to_csv("./user/direct.csv", index = False)
-    return df_new    
+        print("파일이 없습니다.")
+        return
+    
+    return df_new
 
+#움직인 방향, 변하는 점 개수 알려주는 함수
+#direction함수 선 실행 필수☆
+def move_direct(User_classification,exercise_Type):
+    
+    if User_classification=="trainer" and exercise_Type=="벤치프레스":
+        path="./trainer/벤치프레스/트레이너_벤치프레스_방향.csv"
+        print("트레이너 - 벤치프레스")
+    elif User_classification=="trainer" and exercise_Type=="스쿼트":
+        path="./trainer/스쿼트/트레이너_스쿼트_방향.csv"
+        print("트레이너 - 스쿼트")
+    elif User_classification=="trainer" and exercise_Type=="풀업":
+        path="./trainer/풀업/트레이너_풀업_방향.csv"
+        print("트레이너 - 풀업")
+    elif User_classification=="user" and exercise_Type=="벤치프레스":
+        path="./user/벤치프레스/유저_벤치프레스_방향.csv"
+        print("유저 - 벤치프레스")
+    elif User_classification=="user" and exercise_Type=="스쿼트":
+        path="./user/스쿼트/유저_스쿼트_방향.csv"
+        print("유저 - 스쿼트")
+    elif User_classification=="user" and exercise_Type=="풀업":
+        path="./user/풀업/유저_풀업_방향.csv"
+        print("유저 - 풀업")
+    else:
+        print("방향 파일이 없습니다.")
+        return
+    
+    data = pd.read_csv(path)
+    
+    if exercise_Type=="벤치프레스":
+        measure_body = [2, 3, 4, 5, 6, 7] #4,7:손목 3,6:팔꿈치 2,5:어깨
+    elif exercise_Type=="스쿼트":
+        measure_body = [8, 9, 14] #8:엉덩이 9:무릎 14:명치
+       
+    for i in measure_body:
+        list=[]
+        for j in range(0,len(data)-1):
+            direct=data.iat[j,i]
+            
+            if direct==1: direct="→"
+            elif direct==2: direct="↗"
+            elif direct==3: direct="↑"
+            elif direct==4: direct="↖"
+            elif direct==5: direct="←"
+            elif direct==6: direct="↙"
+            elif direct==7: direct="↓"
+            elif direct==8: direct="↘"
+            
+            if pd.notnull(direct):
+                list.append(direct)
+            for k in range(0,len(list)-1):
+                if list[k]==list[k+1]:
+                    del list[k+1]
+        print("[{}] direct:{} \nchanged point count:{}".format(i,list,len(list)-1))
+        
 # 운동 부위별 각도 계산
 # 1. 벤치프레스
 def benchpress_angle(path):
