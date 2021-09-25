@@ -26,4 +26,10 @@ compare.range_motion("user","trainer","벤치프레스")
 compare.angle_change("user","trainer","스쿼트")
 compare.angle_change("user","trainer","벤치프레스")
 
+#방향 변화
+compare.direct("trainer","스쿼트")
+compare.move_direct("trainer","스쿼트")
+compare.direct("trainer","벤치프레스")
+compare.move_direct("trainer","벤치프레스")
+
 
