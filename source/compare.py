@@ -7,6 +7,11 @@ import io
 sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding = 'utf-8')
 sys.stderr = io.TextIOWrapper(sys.stderr.detach(), encoding = 'utf-8')
 
+global BODY_PARTS
+BODY_PARTS = {0:"머리", 1:"목", 2:"오른쪽 어깨", 3:"오른쪽 팔꿈치", 4:"오른쪽 팔목",
+              5:"왼쪽어깨", 6:"왼쪽 팔꿈치", 7:"왼쪽 팔목", 8:"오른쪽 엉덩이", 9:"오른쪽 무릎",
+              10:"오른쪽 발목", 11:"왼쪽 엉덩이", 12:"왼쪽 무릎", 13:"왼쪽 발목", 14:"허리",
+              15:"Background"}
 
 #4구간 평균 각도 비교
 def angle_parts(data,data2):#트레이너데이터, 유저 데이터
@@ -39,51 +44,81 @@ def angle_parts(data,data2):#트레이너데이터, 유저 데이터
     second_result=round(U_second/T_second*100,1)
     third_result=round(U_third/T_third*100,1)
     last_result=round(U_last/T_last*100,1)
-    print("트레이너 대비 0%~25% 구간 평균각도 비율:",first_result)
-    print("트레이너 대비 25%~50% 구간 평균각도 비율:",second_result)
-    print("트레이너 대비 50%~75% 구간 평균각도 비율:",third_result)
-    print("트레이너 대비 75%~100% 구간 평균각도 비율:",last_result)
+    # print("트레이너 대비 0%~25% 구간 평균각도 비율:",first_result)
+    # print("트레이너 대비 25%~50% 구간 평균각도 비율:",second_result)
+    # print("트레이너 대비 50%~75% 구간 평균각도 비율:",third_result)
+    # print("트레이너 대비 75%~100% 구간 평균각도 비율:",last_result)
+    return first_result,second_result,third_result,last_result
     
+
+#4개구간 저장 함수    
+def listplus(box,data1,data2,data3,data4):
+    box.append("트레이너 대비 0%~25% 구간 평균각도 비율: "+ str(data1))
+    box.append("트레이너 대비 25%~50% 구간 평균각도 비율: "+ str(data2))
+    box.append("트레이너 대비 50%~75% 구간 평균각도 비율: "+ str(data3))
+    box.append("트레이너 대비 75%~100% 구간 평균각도 비율: "+ str(data4))
     
+#점수화
+def score(data):
+    if data<=100:
+        return data
+    else:
+        return 200-data
 
 #각도변화량 계산
 def angle_change(U,T,E):#유저,트레이너,운동종류
+    
+    grade=[]#점수
+    detail=[]#자세히보기 기능
     user_path=check_path(U,E)
     trainer_path=check_path(T,E)
     
     if E=="스쿼트":
-        print("<스쿼트>-각도변화량")
+        detail.append("<스쿼트>-각도변화량")
         T_back_neck = angle(trainer_path, 14,1,0)#뒷목
         U_back_neck = angle(user_path,14,1,0)
-        print("뒷목 각도 변화:")
-        angle_parts(T_back_neck,U_back_neck)
-        print()
-        
+        detail.append("뒷목 각도 변화")
+        first,second,third,last=angle_parts(T_back_neck,U_back_neck)
+        listplus(detail,first,second,third,last)
+        grade.append(score(first));grade.append(score(second));grade.append(score(third));grade.append(score(last))
+   
         T_back_right_knee = angle(trainer_path, 10,9,8) # 오른쪽 뒷무릎
         U_back_right_knee = angle(user_path, 10,9,8)
-        print("무릎 각도 변화:")
-        angle_parts(T_back_right_knee,U_back_right_knee)
-        print()
+        detail.append("무릎 각도 변화")
+        first,second,third,last=angle_parts(T_back_right_knee,U_back_right_knee)
+        listplus(detail,first,second,third,last)
+        grade.append(score(first));grade.append(score(second));grade.append(score(third));grade.append(score(last))
+
         
         T_spine = angle(trainer_path, 8,14,1)#척추
         U_spine= angle(user_path, 8,14,1)#척추
-        print("척추 각도 변화:")
-        angle_parts(T_spine,U_spine)
-        print()
+        detail.append("척추 각도 변화:")
+        first,second,third,last=angle_parts(T_spine,U_spine)
+        listplus(detail,first,second,third,last)
+        grade.append(score(first));grade.append(score(second));grade.append(score(third));grade.append(score(last))
+        
+        #print("스쿼트 총점:",round(np.mean(grade),1))
+        #print(E,"총점수:")
+        return round(np.mean(grade),1),detail
         
     elif E=="벤치프레스":
-        print("<벤치프레스>-각도변화량")
+        detail.append("<벤치프레스>-각도변화량")
         T_left_arm = angle(trainer_path, 2,3,4) # 왼팔
         T_right_arm = angle(trainer_path, 7,6,5) # 오른팔
         U_left_arm = angle(user_path, 2,3,4) # 왼팔
         U_right_arm = angle(user_path, 7,6,5) # 오른팔
-        print("왼팔 각도 변화:")
-        angle_parts(T_left_arm,U_left_arm)
-        print()
-        print("오른팔 각도 변화:")
-        angle_parts(T_right_arm,U_right_arm)
-        print()
+        detail.append("왼팔 각도 변화")
+        first,second,third,last= angle_parts(T_left_arm,U_left_arm)
+        listplus(detail,first,second,third,last)
+        grade.append(score(first));grade.append(score(second));grade.append(score(third));grade.append(score(last))
+        detail.append("오른팔 각도 변화")
+        first,second,third,last= angle_parts(T_right_arm,U_right_arm)
+        listplus(detail,first,second,third,last)
+        grade.append(score(first));grade.append(score(second));grade.append(score(third));grade.append(score(last))
+        #print("벤치프레스 총점:", round(np.mean(grade),1))
+        #print(E,"총점수:")
         
+        return round(np.mean(grade),1), detail
 #가동범위 출력 함수
 def range_motion(U,T,E):#유저,트레이너,운동종류
     user_path=check_path(U,E)
@@ -94,11 +129,12 @@ def range_motion(U,T,E):#유저,트레이너,운동종류
         user_range=squat_angle(user_path)
         T_knee=max(trainer_range[1])-min(trainer_range[1])
         U_Knee=max(user_range[1])-min(user_range[1])
-        print("<스쿼트>- 가동범위 비교 결과:")
+        #print("<스쿼트>- 가동범위 비교 결과:")
         # print("트레이너 무릎 가동범위",T_knee)
         result=round((U_Knee/T_knee)*100,1)
-        print("트레이너 대비 무릎 가동범위 비율:", result)
-        print()
+        # print("트레이너 대비 무릎 가동범위 비율:", result)
+        # print()
+        return result
         # if 85<=result<=100 :
         #     print("참 잘했어요.")
         # elif result>100:
@@ -115,7 +151,7 @@ def range_motion(U,T,E):#유저,트레이너,운동종류
         U_right_angle=max(user_range[1])-min(user_range[1])
         U_left_angle=max(user_range[0])-min(user_range[0])
         
-        print("<벤치프레스>- 가동범위 비교 결과:")
+        # print("<벤치프레스>- 가동범위 비교 결과:")
         # print("트레이너 왼팔 가동범위",T_left_angle)
         # print("트레이너 오른팔 가동범위",T_right_angle)
         # print("유저 왼팔 가동범위",U_left_angle)
@@ -123,10 +159,12 @@ def range_motion(U,T,E):#유저,트레이너,운동종류
         
         left_result=round((U_left_angle/T_left_angle)*100,1)
         right_result=round((U_right_angle/T_right_angle)*100,1)
-        print("트레이너 대비 왼팔 가동범위 비율:", left_result)
-        print("트레이너 대비 오른팔 가동범위 비율:", right_result)
-        print()
+        # print("트레이너 대비 왼팔 가동범위 비율:", left_result)
+        # print("트레이너 대비 오른팔 가동범위 비율:", right_result)
+        # print()
         
+        return left_result,right_result
+    
         # if 85<=left_result<=100 :
         #     print("왼팔: 참 잘했어요.")
         # elif right_result>100:
@@ -352,7 +390,7 @@ def move_direct(User_classification,exercise_Type):
             for k in range(0,len(list)-1):
                 if list[k]==list[k+1]:
                     del list[k+1]
-        print("[{}] direct:{} \nchanged point count:{}".format(i,list,len(list)-1))
+        print("[{}] direct:{} \nchanged point count:{}".format(BODY_PARTS[i],list,len(list)-1))
         
 # 운동 부위별 각도 계산
 # 1. 벤치프레스
