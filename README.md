@@ -10,3 +10,7 @@ model 폴더에 넣어 주세요.
 ## 구성도
 -백그라운드 로직 수행을 위해 멀티프로세싱이 사용되었습니다.-
 ![image](https://user-images.githubusercontent.com/63800086/174829013-13d70af8-791c-4dc3-94f8-c93348e88ece.png)
+
+## 웹서비스
+-트레이너와 유저를 구별하기 위해 움직을 다르게 촬영했습니다.-
+![image](https://user-images.githubusercontent.com/63800086/174830917-3914d9d5-820f-4787-8af0-fd494157e8ac.png)
