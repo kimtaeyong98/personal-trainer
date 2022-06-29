@@ -8,9 +8,9 @@
 model 폴더에 넣어 주세요. 
 
 ## 구성도
--백그라운드 로직 수행을 위해 멀티프로세싱이 사용되었습니다.-
+-백그라운드 로직 수행을 위해 멀티프로세싱이 사용되었습니다.
 ![image](https://user-images.githubusercontent.com/63800086/174829013-13d70af8-791c-4dc3-94f8-c93348e88ece.png)
 
 ## 웹서비스
--서버 컴퓨터 사양에 따라 계산에 많은 시간이 소요될 수 있습니다.(GPU )
+-서버 컴퓨터 사양에 따라 계산에 많은 시간이 소요될 수 있습니다.(GPU연 )
 ![image](https://user-images.githubusercontent.com/63800086/174832287-59c5e507-da98-4ab4-9e57-0d3048dd7b39.png)
